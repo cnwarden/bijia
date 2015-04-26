@@ -1,0 +1,19 @@
+{% load staticfiles %}
+{% static "" as BASE_URL %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<ul>
+    {% for stock in stock_list %}
+    <li>
+        <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg /><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>
