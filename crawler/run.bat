@@ -1,2 +1,3 @@
 cd /d %cd%
-scrapy crawl jd_web -a category="9987,653,655"
+REM 9987,653,655 737,794,798
+scrapy crawl jd_web -a category="737,794,798"

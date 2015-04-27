@@ -3,18 +3,28 @@
 {% static "" as BASE_URL %}
 
 {% block content %}
-<ul>
     {% for stock in stock_list %}
-    <li>
-        <!-- <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg /> -->
+    <div class="stock_info">
+        <div class="image-wrapper">
+            <img height="60" width="60" src={{ BASE_URL }}img/{{ stock.uid }}.jpg />
+        </div>
+        <span class="stock_post"><a>京东</a>&nbsp;&nbsp;</span><br/>
+        <span class="stock_title"><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></span><br/>
+        <span class="stock_price">
+            {% with stock.price_list|last as last_price %}
+                {{ last_price.price }} @ {{ last_price.time }}
+            {% endwith %}
+        </span>
+        <!-- <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg />
         <a href={{ stock.url }} target="_blank">{{ stock.name }}</a>
         {% with stock.price_list|last as last_price %}
             {{ last_price.price }} @ {{ last_price.time }}
         {% endwith %}
         @
         {{ stock.comments }}
+        -->
+    </div>
     {% endfor %}
-</ul>
 
 {% endblock %}
 

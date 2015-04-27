@@ -7,6 +7,7 @@
 #
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #
+import platform
 
 BOT_NAME = 'stock'
 
@@ -27,5 +28,8 @@ MONGODB_DB = 'jd'
 MONGODB_COLLECTION = 'stocks'
 
 
-JD_IMAGE_ENABLE = False
+JD_IMAGE_ENABLE = True
 JD_IMAGE_PATH = '/workspace/bijia/static/img/'
+
+if platform.system() == "Windows":
+    JD_IMAGE_PATH = 'D:\\991_GitHub\\bijia\\static\\img'

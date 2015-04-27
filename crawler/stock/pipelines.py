@@ -27,7 +27,7 @@ class StockPipeline(object):
                                                 {'$push' : { 'price_list' :
                                                      { 'price':item['price'], 'time':item['timestamp'] } }}, True)
         elif isinstance(item, JDStockImage):
-            img_path = os.path.join(settings['JD_IMAGE_PATH'], item['uid'] + '.jpg')
+            img_path = os.path.join(settings['JD_IMAGE_PATH'], str(item['uid']) + '.jpg')
             fp_img = open(img_path, 'wb')
             fp_img.write(item['data'])
             fp_img.close()

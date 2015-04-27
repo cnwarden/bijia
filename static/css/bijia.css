@@ -2,15 +2,18 @@
 
 #navigation {
     margin-top: 0px;
-    height: 60px;
+    height: 30px;
+    width: 100%;
     color: #727272;
     background-color: #f9f9f9;
     border-bottom: 1px solid #d8d8d8;
-    position: relative;
+    position: fixed;
+    z-index: 1000;
+    display: block;
 }
 
 #nav {
-    height: 60px;
+    height: 30px;
     margin: 0;
     padding: 0;
     position: absolute;
@@ -23,13 +26,54 @@
 }
 
 #nav li {
-    float: left;
-    overflow: hidden;
+    float: left !important;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    vertical-align: middle;
+    line-height: 30px;
     list-style: none;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
-#nav li a {
-    position: relative;
-    top: 8px;
-    margin-right: 5px;
+footer {
+    background: #282828;
+    clear: both;
+    padding: 40px 0 45px;
+}
+
+#content {
+    padding-top: 30px;
+}
+
+.stock_info {
+    background: #fff;
+    border:1px solid #d7d7d7;
+    box-shadow: 0 3px 5px rgba(4,5,5,.04);
+    box-sizing: border-box;
+    margin: 0 0 18px;
+    min-height: 80px;
+}
+
+.stock_post {
+    color: #9d9d9d;
+    font-size: 12px;
+    line-height: 21px;
+}
+
+.stock_title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.stock_price {
+    font-size: 12px;
+    color: #ff0002;
+}
+
+.image-wrapper {
+    display: block;
+    float: left !important;
+    vertical-align: middle;
 }
