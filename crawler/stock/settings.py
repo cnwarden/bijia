@@ -21,11 +21,11 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML
 
 LOG_LEVEL = 'INFO'
 
-MONGODB_SERVER = '192.168.31.121'
+MONGODB_SERVER = '127.0.0.1'
 MONGODB_PORT = 27017
 MONGODB_DB = 'jd'
 MONGODB_COLLECTION = 'stocks'
 
 
 JD_IMAGE_ENABLE = False
-JD_IMAGE_PATH = 'D:/991_GitHub/crawler/images'
+JD_IMAGE_PATH = '/workspace/bijia/static/img/'

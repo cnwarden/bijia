@@ -64,7 +64,7 @@ class JDSpider(scrapy.Spider):
 
         if(response.meta.has_key('stock_img')):
             item = JDStockImage()
-            item['id'] = response.meta['stock_id']
+            item['uid'] = response.meta['stock_id']
             item['data'] = response.body
             yield item
             return
