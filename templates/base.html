@@ -1,0 +1,39 @@
+{% load staticfiles %}
+{% static "" as BASE_URL %}
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title></title>
+</head>
+<body>
+
+<link rel="stylesheet" href="{{ BASE_URL }}css/bootstrap.css">
+<link rel="stylesheet" href="{{ BASE_URL }}css/bijia.css">
+
+</body>
+
+{% block navigator %}
+    <div id="navigation">
+        <ul id="nav" class="menu">
+            <li class="nav-link"><a href="#">News</a></li>
+            <li class="nav-link"><a href="#">News</a></li>
+            <li class="nav-link"><a href="#">News</a></li>
+            <li class="nav-link"><a href="#">News</a></li>
+            <li class="nav-link"><a href="#">News</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
+
+<!-- <script src="{{ BASE_URL }}/js/bootstrap.js"></script> -->
+<script src="{{ BASE_URL }}js/jquery-1.11.2.js"></script>
+</html>

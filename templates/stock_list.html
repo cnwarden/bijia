@@ -1,19 +1,8 @@
+{% extends "base.html" %}
 {% load staticfiles %}
 {% static "" as BASE_URL %}
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
 
-<style>
-    a {
-        font-size: 12px;
-    }
-
-</style>
+{% block content %}
 <ul>
     {% for stock in stock_list %}
     <li>
@@ -26,6 +15,8 @@
         {{ stock.comments }}
     {% endfor %}
 </ul>
+
+{% endblock %}
 
 </body>
 </html>

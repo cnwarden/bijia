@@ -1,0 +1,35 @@
+
+
+#navigation {
+    margin-top: 0px;
+    height: 60px;
+    color: #727272;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #d8d8d8;
+    position: relative;
+}
+
+#nav {
+    height: 60px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.menu {
+    list-style-type: none;
+}
+
+#nav li {
+    float: left;
+    overflow: hidden;
+    list-style: none;
+}
+
+#nav li a {
+    position: relative;
+    top: 8px;
+    margin-right: 5px;
+}
