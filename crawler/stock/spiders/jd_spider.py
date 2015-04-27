@@ -15,10 +15,12 @@ class JDSpider(scrapy.Spider):
     name = "jd_web"
     start_urls = []
 
-    def __init__(self):
-        super(JDSpider, self).__init__()
-
-        self.start_urls.append('http://list.jd.com/list.html?cat=737%2C794%2C798&page=1&&delivery=1&JL=6_0_0')
+    def __init__(self, category=None, *args, **kwargs):
+        super(JDSpider, self).__init__(*args, **kwargs)
+	
+	#for cat in category:
+        self.log(category, INFO)
+        self.start_urls.append('http://list.jd.com/list.html?cat=%s&page=1&&delivery=1&JL=6_0_0' % (category))
 
     def extract_single_stock(self, node):
         #price_class = node.xpath('.//div[@class="p-price"]/strong/@class').extract()[0]
@@ -27,7 +29,7 @@ class JDSpider(scrapy.Spider):
         img = node.xpath('.//div[@class="p-img"]/a/img/@data-lazy-img').extract()[0]
         # remove the prefix J_
         id = url[url.rfind("/")+1 : url.rfind(".html")]
-        #self.log("%s-%s-%s" % (id, url, name), INFO)
+        self.log("%s-%s-%s" % (id, url, name), INFO)
 
         return (id, name, url, img)
 
