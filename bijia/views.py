@@ -7,5 +7,5 @@ from bijia.models import Stock
 from django.shortcuts import render_to_response
 
 def stocklistview(request):
-    stocks = Stock.objects
+    stocks = Stock.objects.order_by('-comments')
     return render_to_response('stock_list.html', context={'stock_list' : stocks})

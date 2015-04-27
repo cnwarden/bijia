@@ -17,8 +17,7 @@ class JDSpider(scrapy.Spider):
 
     def __init__(self, category=None, *args, **kwargs):
         super(JDSpider, self).__init__(*args, **kwargs)
-	
-	#for cat in category:
+        
         self.log(category, INFO)
         self.start_urls.append('http://list.jd.com/list.html?cat=%s&page=1&&delivery=1&JL=6_0_0' % (category))
 
@@ -27,32 +26,34 @@ class JDSpider(scrapy.Spider):
         url = node.xpath('.//div[@class="p-name"]/a/@href').extract()[0]
         name = node.xpath('.//div[@class="p-name"]/a/@title').extract()[0]
         img = node.xpath('.//div[@class="p-img"]/a/img/@data-lazy-img').extract()[0]
+        comments = node.xpath('.//div[@class="p-commit"]//a/text()').extract()[0]
         # remove the prefix J_
         id = url[url.rfind("/")+1 : url.rfind(".html")]
-        self.log("%s-%s-%s" % (id, url, name), INFO)
+        #self.log("%s-%s-%s" % (id, url, name), INFO)
 
-        return (id, name, url, img)
+        return (id, name, url, img, comments)
 
     def generate_price_query_url(self, stock_id):
         return 'http://p.3.cn/prices/get?skuid=J_' + stock_id
 
     def generate_item(self, stock):
         item = JDStockItem()
-        item['uid'] = stock[0]
+        item['uid'] = int(stock[0])
         item['name'] = stock[1]
         item['url'] = stock[2]
+        item['comments'] = int(stock[4])
         return item
 
     def generate_price_item(self, price):
         item = JDStockPrice()
-        item['uid'] = price[0]
+        item['uid'] = int(price[0])
         item['price'] = price[1]
         item['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return item
 
     def generate_img_item(self, image):
         item = JDStockImage()
-        item['uid'] = image[0]
+        item['uid'] = int(image[0])
         item['data'] = image[3]
         return item
 
@@ -66,7 +67,7 @@ class JDSpider(scrapy.Spider):
 
         if(response.meta.has_key('stock_img')):
             item = JDStockImage()
-            item['uid'] = response.meta['stock_id']
+            item['uid'] = int(response.meta['stock_id'])
             item['data'] = response.body
             yield item
             return

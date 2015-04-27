@@ -8,10 +8,22 @@
 </head>
 <body>
 
+<style>
+    a {
+        font-size: 12px;
+    }
+
+</style>
 <ul>
     {% for stock in stock_list %}
     <li>
-        <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg /><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></li>
+        <!-- <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg /> -->
+        <a href={{ stock.url }} target="_blank">{{ stock.name }}</a>
+        {% with stock.price_list|last as last_price %}
+            {{ last_price.price }} @ {{ last_price.time }}
+        {% endwith %}
+        @
+        {{ stock.comments }}
     {% endfor %}
 </ul>
 

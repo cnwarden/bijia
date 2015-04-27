@@ -35,6 +35,8 @@ class StockPipeline(object):
             result = self.collection.find_one({'uid': item['uid']})
             if not result:
                 result = self.collection.insert(dict(item))
+            else:
+                result = self.collection.update({'uid': item['uid']}, {'$set':{'comments':item['comments']}})
         else:
             pass
         return item
