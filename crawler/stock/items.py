@@ -20,8 +20,14 @@ class JDStockItem(scrapy.Item):
 class JDStockPrice(scrapy.Item):
     uid = scrapy.Field()
     price = scrapy.Field()
+    mobile_price = scrapy.Field()
     timestamp = scrapy.Field()
 
 class JDStockImage(scrapy.Item):
     uid = scrapy.Field()
     data = scrapy.Field()
+
+class JDStockPromotion(scrapy.Item):
+    uid = scrapy.Field()
+    mobile_price = scrapy.Field()
+    timestamp = scrapy.Field()

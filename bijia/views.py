@@ -17,14 +17,15 @@ def stocklistview(request):
 
     if provider == 'jd':
         if display_method == '2':
-            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:10]
+            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:20]
         elif display_method == '3':
-            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:10]
-        elif display_method == '4':
-            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:10]
+            #stocks = Stock.objects.filter(category=category).fields(slice__price_list=-1).order_by('last_update')[0:20]
+            stocks = Stock.objects.filter(category=category).where(
+            "this.price_list[this.price_list.length-1].price != this.price_list[this.price_list.length-1].mobile_price")\
+                .order_by('last_update')[0:20]
         else:
             # show all
-            stocks = Stock.objects.filter(category=category).order_by('last_update')[0:10]
+            stocks = Stock.objects.filter(category=category).order_by('last_update')[0:20]
 
         return render_to_response('stock_list.html',
                                   context={'stock_list' : stocks,

@@ -5,6 +5,7 @@ from mongoengine import *
 
 class PriceList(EmbeddedDocument):
     price = StringField()
+    mobile_price = StringField()
     time = StringField()
 
 class Stock(Document):

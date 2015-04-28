@@ -9,7 +9,7 @@ import os
 from pymongo import MongoClient
 
 from scrapy.conf import settings
-from stock.items import JDStockItem, JDStockPrice, JDStockImage
+from stock.items import JDStockItem, JDStockPrice, JDStockImage, JDStockPromotion
 from datetime import datetime
 
 class StockPipeline(object):
@@ -20,6 +20,23 @@ class StockPipeline(object):
         self.client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
         self.db = self.client[settings['MONGODB_DB']]
         self.collection = self.db[settings['MONGODB_COLLECTION']]
+
+    def update_promotion(self, item):
+        result = self.collection.find_one({'uid': item['uid']})
+        if result:
+                if result.has_key('mobile_price_list'):
+                    if result['mobile_price_list'][-1]['price'] == item['mobile_price']:
+                        pass
+                    else:
+                        result = self.collection.update({'uid': item['uid']}, {
+                            '$push' : { 'mobile_price_list' : { 'price':item['mobile_price'], 'time':item['timestamp'] } },
+                            '$set'  : { 'changed' : 1 }
+                            }, True)
+                else:
+                    result = self.collection.update({'uid': item['uid']}, {
+                        '$push' : { 'mobile_price_list' : { 'price':item['mobile_price'], 'time':item['timestamp'] } },
+                        '$set'  : { 'changed' : 0 }
+                        }, True)
 
     def process_item(self, item, spider):
         if isinstance(item, JDStockPrice):
@@ -33,14 +50,24 @@ class StockPipeline(object):
                         pass
                     else:
                         result = self.collection.update({'uid': item['uid']}, {
-                            '$push' : { 'price_list' : { 'price':item['price'], 'time':item['timestamp'] } },
+                            '$push' : { 'price_list' :
+                                            { 'price':item['price'], 'mobile_price': item['price'], 'time':item['timestamp'] } },
                             '$set'  : { 'changed' : 1 }
                             }, True)
                 else:
                     result = self.collection.update({'uid': item['uid']}, {
-                        '$push' : { 'price_list' : { 'price':item['price'], 'time':item['timestamp'] } },
+                        '$push' : { 'price_list' :
+                                        { 'price':item['price'], 'mobile_price': item['price'], 'time':item['timestamp'] } },
                         '$set'  : { 'changed' : 0 }
                         }, True)
+        elif isinstance(item, JDStockPromotion):
+            # promotion be after the price, set last price to correct one
+            result = self.collection.find_one({'uid': item['uid']})
+            last_time = result['price_list'][-1]['time']
+            result = self.collection.update({'uid': item['uid'], 'price_list.time': last_time}, {
+                            '$set' : { 'price_list.$.mobile_price' : item['mobile_price'] },
+                            }, True)
+            print item['uid']
 
         elif isinstance(item, JDStockImage):
             img_path = os.path.join(settings['JD_IMAGE_PATH'], str(item['uid']) + '.jpg')
@@ -50,7 +77,7 @@ class StockPipeline(object):
         elif isinstance(item, JDStockItem):
             result = self.collection.find_one({'uid': item['uid']})
             if not result:
-                item['create_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                item['create_time'] = datetime.now()
                 result = self.collection.insert(dict(item))
             else:
                 result = self.collection.update({'uid': item['uid']}, {'$set':{'comments':item['comments']}})
