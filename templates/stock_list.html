@@ -12,7 +12,7 @@
         <span class="stock_title"><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></span><br/>
         <span class="stock_price">
             {% with stock.price_list|last as last_price %}
-                {{ last_price.price }} @ {{ last_price.time }}
+                {{ last_price.price }} @ {{ stock.last_update }}
             {% endwith %}
         </span>
         <!-- <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg />
