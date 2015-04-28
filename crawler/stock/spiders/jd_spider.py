@@ -8,6 +8,7 @@ from scrapy.log import INFO
 from datetime import datetime
 from json.decoder import JSONDecoder
 from scrapy.conf import settings
+import os
 
 PRICE_BASE_URL = 'http://p.3.cn/prices/get?skuid='
 
@@ -20,6 +21,10 @@ class JDSpider(scrapy.Spider):
         
         self.log(category, INFO)
         self.start_urls.append('http://list.jd.com/list.html?cat=%s&page=1&&delivery=1&JL=6_0_0' % (category))
+        self.category = category
+
+    def make_requests_from_url(self, url):
+        return Request(url, dont_filter=True, meta={'category' : self.category})
 
     def extract_single_stock(self, node):
         #price_class = node.xpath('.//div[@class="p-price"]/strong/@class').extract()[0]
@@ -42,6 +47,7 @@ class JDSpider(scrapy.Spider):
         item['name'] = stock[1]
         item['url'] = stock[2]
         item['comments'] = int(stock[4])
+        item['category'] = self.get_category(self.category)
         item['changed'] = 0
         item['last_update'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return item
@@ -58,6 +64,21 @@ class JDSpider(scrapy.Spider):
         item['uid'] = int(image[0])
         item['data'] = image[3]
         return item
+
+    def is_stock_img_exist(self, uid):
+        return os.path.exists(os.path.join(settings['JD_IMAGE_PATH'], '%s.jpg' % (uid)))
+
+    def get_category(self, provider_category):
+        """
+        convert jd category to standard category
+        :return: the value of standard category
+        """
+        if provider_category == '737,794,798':
+            return 1
+        elif provider_category == '737,752,753':
+            return 2
+        else:
+            return 3
 
     def parse(self, response):
         # Get price of item
@@ -80,13 +101,13 @@ class JDSpider(scrapy.Spider):
                 for single_item in stock_tab_items:
                     item = self.extract_single_stock(single_item)
                     yield self.generate_item(item)
-                    if settings['JD_IMAGE_ENABLE']:
+                    if not self.is_stock_img_exist(item[0]):
                         yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
                     yield Request(url=self.generate_price_query_url(item[0]))
             else:
                 item = self.extract_single_stock(stock)
                 yield self.generate_item(item)
-                if settings['JD_IMAGE_ENABLE']:
+                if not self.is_stock_img_exist(item[0]):
                     yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
                 yield Request(url=self.generate_price_query_url(item[0]))
 

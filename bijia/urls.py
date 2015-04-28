@@ -5,5 +5,5 @@ urlpatterns = patterns('',
     # url(r'^$', 'appstore.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^index/', 'bijia.views.stocklistview'),
+    url(r'^index', 'bijia.views.stocklistview'),
 )

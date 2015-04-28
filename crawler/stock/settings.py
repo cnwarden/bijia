@@ -27,8 +27,6 @@ MONGODB_PORT = 27017
 MONGODB_DB = 'jd'
 MONGODB_COLLECTION = 'stocks'
 
-
-JD_IMAGE_ENABLE = True
 JD_IMAGE_PATH = '/workspace/bijia/static/img/'
 
 if platform.system() == "Windows":

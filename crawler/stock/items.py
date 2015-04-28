@@ -11,7 +11,9 @@ class JDStockItem(scrapy.Item):
     uid = scrapy.Field()
     name = scrapy.Field()
     url = scrapy.Field()
+    category = scrapy.Field()
     comments = scrapy.Field()
+    create_time = scrapy.Field()
     changed = scrapy.Field()
     last_update = scrapy.Field()
 

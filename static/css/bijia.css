@@ -13,7 +13,7 @@
 }
 
 #nav {
-    height: 30px;
+    height: 60px;
     margin: 0;
     padding: 0;
     position: absolute;
@@ -23,6 +23,11 @@
 
 .menu {
     list-style-type: none;
+}
+
+.nav-select {
+    height: 25px;
+    border: 1px solid #9d9d9d;
 }
 
 #nav li {
@@ -68,8 +73,15 @@ footer {
 }
 
 .stock_price {
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
     color: #ff0002;
+}
+
+.stock_update_time {
+    font-size: 12px;
+    font-family: Arial;
+    color: #398439;
 }
 
 .image-wrapper {

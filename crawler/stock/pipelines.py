@@ -10,6 +10,7 @@ from pymongo import MongoClient
 
 from scrapy.conf import settings
 from stock.items import JDStockItem, JDStockPrice, JDStockImage
+from datetime import datetime
 
 class StockPipeline(object):
 
@@ -49,6 +50,7 @@ class StockPipeline(object):
         elif isinstance(item, JDStockItem):
             result = self.collection.find_one({'uid': item['uid']})
             if not result:
+                item['create_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 result = self.collection.insert(dict(item))
             else:
                 result = self.collection.update({'uid': item['uid']}, {'$set':{'comments':item['comments']}})
