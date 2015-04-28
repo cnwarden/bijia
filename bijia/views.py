@@ -17,11 +17,11 @@ def stocklistview(request):
 
     if provider == 'jd':
         if display_method == '2':
-            stocks = Stock.objects.filter(changed=1).order_by('last_update')[0:10]
+            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:10]
         elif display_method == '3':
-            stocks = Stock.objects.filter(changed=1).order_by('last_update')[0:10]
+            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:10]
         elif display_method == '4':
-            stocks = Stock.objects.filter(changed=1).order_by('last_update')[0:10]
+            stocks = Stock.objects.filter(category=category, changed=1).order_by('last_update')[0:10]
         else:
             # show all
             stocks = Stock.objects.filter(category=category).order_by('last_update')[0:10]
