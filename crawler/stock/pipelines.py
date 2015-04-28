@@ -20,12 +20,27 @@ class StockPipeline(object):
         self.db = self.client[settings['MONGODB_DB']]
         self.collection = self.db[settings['MONGODB_COLLECTION']]
 
-
     def process_item(self, item, spider):
         if isinstance(item, JDStockPrice):
             result = self.collection.update({'uid': item['uid']},
-                                                {'$push' : { 'price_list' :
-                                                     { 'price':item['price'], 'time':item['timestamp'] } }}, True)
+                                            {'$set' : {'last_update': item['timestamp']}}, True)
+
+            result = self.collection.find_one({'uid': item['uid']})
+            if result:
+                if result.has_key('price_list'):
+                    if result['price_list'][-1]['price'] == item['price']:
+                        pass
+                    else:
+                        result = self.collection.update({'uid': item['uid']}, {
+                            '$push' : { 'price_list' : { 'price':item['price'], 'time':item['timestamp'] } },
+                            '$set'  : { 'changed' : 1 }
+                            }, True)
+                else:
+                    result = self.collection.update({'uid': item['uid']}, {
+                        '$push' : { 'price_list' : { 'price':item['price'], 'time':item['timestamp'] } },
+                        '$set'  : { 'changed' : 0 }
+                        }, True)
+
         elif isinstance(item, JDStockImage):
             img_path = os.path.join(settings['JD_IMAGE_PATH'], str(item['uid']) + '.jpg')
             fp_img = open(img_path, 'wb')

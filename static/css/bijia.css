@@ -52,7 +52,7 @@ footer {
     border:1px solid #d7d7d7;
     box-shadow: 0 3px 5px rgba(4,5,5,.04);
     box-sizing: border-box;
-    margin: 0 0 18px;
+    margin: 0 0 5px;
     min-height: 80px;
 }
 
@@ -76,4 +76,5 @@ footer {
     display: block;
     float: left !important;
     vertical-align: middle;
+    margin-top: 10px;
 }

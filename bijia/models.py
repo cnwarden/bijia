@@ -12,6 +12,8 @@ class Stock(Document):
     name = StringField(max_length=200, required=True)
     url = StringField(max_length=200, required=True)
     comments = IntField(required=True)
+    changed = IntField()
+    last_update = StringField()
     price_list = ListField(EmbeddedDocumentField(PriceList))
 
     meta = {'collection' : 'stocks'}

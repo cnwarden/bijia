@@ -17,11 +17,31 @@
 {% block navigator %}
     <div id="navigation">
         <ul id="nav" class="menu">
-            <li class="nav-link"><a href="#">电视</a></li>
-            <li class="nav-link"><a href="#">News</a></li>
-            <li class="nav-link"><a href="#">News</a></li>
-            <li class="nav-link"><a href="#">News</a></li>
-            <li class="nav-link"><a href="#">News</a></li>
+            <li class="nav-link"><a href="#">供货商</a>
+                <select>
+                    <option>京东</option>
+                </select>
+            </li>
+            <li class="nav-link"><a href="#">类别</a>
+                <select>
+                    <option>平板电视</option>
+                </select>
+            </li>
+            <li class="nav-link">
+                <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=1>全部商品</a>
+            </li>
+            <li class="nav-link">
+                <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=2>最新价格变动</a>
+            </li>
+            <li class="nav-link">
+                <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=3>最新价格下降</a>
+            </li>
+            <li class="nav-link">
+                <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=4>最新价格上涨</a>
+            </li>
+            <li class="nav-link">
+                <a href=/bijia/index?provider={{ provider }}&category={{ category }}>联系我们</a>
+            </li>
         </ul>
     </div>
 {% endblock %}
@@ -34,7 +54,6 @@
 
 {% block footer %}
 <footer>
-AAA
 </footer>
 {% endblock %}
 

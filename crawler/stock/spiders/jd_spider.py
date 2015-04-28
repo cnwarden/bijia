@@ -42,12 +42,14 @@ class JDSpider(scrapy.Spider):
         item['name'] = stock[1]
         item['url'] = stock[2]
         item['comments'] = int(stock[4])
+        item['changed'] = 0
+        item['last_update'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return item
 
     def generate_price_item(self, price):
         item = JDStockPrice()
         item['uid'] = int(price[0])
-        item['price'] = price[1]
+        item['price'] = round(float(price[1]), 2)
         item['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return item
 
