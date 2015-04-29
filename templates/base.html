@@ -26,12 +26,12 @@
 {% block navigator %}
     <div id="navigation">
         <ul id="nav" class="menu">
-            <li class="nav-link"><a href="#">供货商</a>
+            <li class="nav-link">商家
                 <select id="stock_provider" class="nav-select">
                     <option value="jd">京东</option>
                 </select>
             </li>
-            <li class="nav-link"><a href="#">类别</a>
+            <li class="nav-link">类别
                 <select id="stock_category" class="nav-select" onchange="onCategorySelect()">
                     {% for category_item in category_list %}
                         <option value={{ category_item.value }}

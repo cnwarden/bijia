@@ -15,6 +15,9 @@ class JDStockItem(scrapy.Item):
     comments = scrapy.Field()
     create_time = scrapy.Field()
     changed = scrapy.Field()
+    ###
+    last_price = scrapy.Field()
+    last_mobile_price = scrapy.Field()
     last_update = scrapy.Field()
 
 class JDStockPrice(scrapy.Item):

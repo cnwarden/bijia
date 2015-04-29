@@ -11,26 +11,11 @@
         <span class="stock_post"><img height="12" width="12" src={{ BASE_URL }}image/{{ provider }}_favicon.ico><a>京东</a>&nbsp;&nbsp;</span><br/>
         <span class="stock_title"><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></span><br/>
         <span class="stock_price">
-            {% with stock.price_list|last as last_price %}
-                {{ last_price.price }} 移动端
-                {% if last_price.price == last_price.mobile_price %}
-                    {{ last_price.mobile_price }}
-                {% else %}
-                    <strong>{{ last_price.mobile_price }}</strong>
-                {% endif %}
-            {% endwith %}
+            {{ stock.last_price }} 移动端 {{ stock.last_mobile_price }}
         </span>
         <span class="stock_update_time">
-            @ {{ stock.last_update|date:"Y-m-d H:i" }}
+            @ {{ stock.last_update|date:"Y-m-d H:i" }} - {{ stock.comments }}
         </span>
-        <!-- <img width="24" height="24" src={{ BASE_URL }}img/{{ stock.uid }}.jpg />
-        <a href={{ stock.url }} target="_blank">{{ stock.name }}</a>
-        {% with stock.price_list|last as last_price %}
-            {{ last_price.price }} @ {{ last_price.time }}
-        {% endwith %}
-        @
-        {{ stock.comments }}
-        -->
     </div>
     {% endfor %}
 

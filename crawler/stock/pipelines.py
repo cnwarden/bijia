@@ -21,23 +21,6 @@ class StockPipeline(object):
         self.db = self.client[settings['MONGODB_DB']]
         self.collection = self.db[settings['MONGODB_COLLECTION']]
 
-    def update_promotion(self, item):
-        result = self.collection.find_one({'uid': item['uid']})
-        if result:
-                if result.has_key('mobile_price_list'):
-                    if result['mobile_price_list'][-1]['price'] == item['mobile_price']:
-                        pass
-                    else:
-                        result = self.collection.update({'uid': item['uid']}, {
-                            '$push' : { 'mobile_price_list' : { 'price':item['mobile_price'], 'time':item['timestamp'] } },
-                            '$set'  : { 'changed' : 1 }
-                            }, True)
-                else:
-                    result = self.collection.update({'uid': item['uid']}, {
-                        '$push' : { 'mobile_price_list' : { 'price':item['mobile_price'], 'time':item['timestamp'] } },
-                        '$set'  : { 'changed' : 0 }
-                        }, True)
-
     def process_item(self, item, spider):
         if isinstance(item, JDStockPrice):
             result = self.collection.update({'uid': item['uid']},
@@ -45,6 +28,7 @@ class StockPipeline(object):
 
             result = self.collection.find_one({'uid': item['uid']})
             if result:
+                result = self.collection.update({'uid': item['uid']}, {'$set':{'last_price':item['price'], 'last_mobile_price':item['price']}})
                 if result.has_key('price_list'):
                     if result['price_list'][-1]['price'] == item['price']:
                         pass
@@ -60,10 +44,13 @@ class StockPipeline(object):
                                         { 'price':item['price'], 'mobile_price': item['price'], 'time':item['timestamp'] } },
                         '$set'  : { 'changed' : 0 }
                         }, True)
+
         elif isinstance(item, JDStockPromotion):
             # promotion be after the price, set last price to correct one
             result = self.collection.find_one({'uid': item['uid']})
             last_time = result['price_list'][-1]['time']
+
+            result = self.collection.update({'uid': item['uid']}, {'$set':{'last_mobile_price':item['mobile_price']}})
             result = self.collection.update({'uid': item['uid'], 'price_list.time': last_time}, {
                             '$set' : { 'price_list.$.mobile_price' : item['mobile_price'] },
                             }, True)

@@ -17,6 +17,8 @@ class Stock(Document):
     changed = IntField()
     create_time = StringField()
     last_update = StringField()
+    last_price = FloatField()
+    last_mobile_price = FloatField()
     price_list = ListField(EmbeddedDocumentField(PriceList))
 
     meta = {'collection' : 'stocks'}

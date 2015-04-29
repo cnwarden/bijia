@@ -29,8 +29,6 @@ ALLOWED_HOSTS = []
 
 APPEND_SLASH = False
 
-DATETIME_FORMAT="D d M Y"
-
 # Application definition
 
 INSTALLED_APPS = (

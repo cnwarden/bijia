@@ -58,6 +58,8 @@ class JDSpider(scrapy.Spider):
         item['category'] = self.get_category(self.category)
         item['changed'] = 0
         item['last_update'] = datetime.now()
+        item['last_price'] = float(0.0)
+        item['last_mobile_price'] = float(0.0)
         return item
 
     def generate_price_item(self, price):
