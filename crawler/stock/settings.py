@@ -21,7 +21,7 @@ ITEM_PIPELINES = {
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2371.0 Safari/537.36'
 
-LOG_FILE = os.path.join(os.path.dirname(__file__), 'scrapy_crawl.log')
+LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'scrapy_crawl.log')
 print LOG_FILE
 LOG_LEVEL = 'INFO'
 
