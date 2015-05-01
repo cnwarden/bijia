@@ -17,7 +17,15 @@
             {% endif %}
         </span>
         <span class="stock_update_time">
-            @ {{ stock.last_update|date:"Y-m-d H:i" }} - {{ stock.comments }}
+            @
+            {% if display_method == '3' %}
+                上架时间:{{ stock.create_time|date:"Y-m-d H:i" }}
+            {% elif display_method == '4' %}
+                变动时间:{{ stock.degree.change_time|date:"Y-m-d H:i" }}
+            {% else %}
+                更新时间:{{ stock.last_update|date:"Y-m-d H:i" }}
+            {% endif %}
+            - 评论数:{{ stock.comments }}
         </span>
     </div>
     {% endfor %}

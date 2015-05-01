@@ -36,7 +36,7 @@ def stocklistview(request):
             stocks = Stock.objects.filter(category=category).order_by('-degree.change_time')[0:20]
         elif display_method == '5':
             #移动好价
-            stocks = Stock.objects.filter(category=category).where('this.last_price != this.last_mobile_price').order_by('last_price')[0:20]
+            stocks = Stock.objects.filter(category=category).where('this.last_price != this.last_mobile_price').order_by('-degree.change_time')[0:20]
         else:
             #所有商品
             stocks = Stock.objects.all().order_by('-comments')[0:20]
