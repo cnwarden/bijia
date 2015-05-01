@@ -12,6 +12,9 @@
         <span class="stock_title"><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></span><br/>
         <span class="stock_price">
             {{ stock.last_price }} 移动端 {{ stock.last_mobile_price }}
+            {% if display_method == '1' %}
+                值度: <em>{{ stock.degree.value }}</em>
+            {% endif %}
         </span>
         <span class="stock_update_time">
             @ {{ stock.last_update|date:"Y-m-d H:i" }} - {{ stock.comments }}

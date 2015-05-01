@@ -75,6 +75,10 @@ footer {
 .stock_price {
     font-size: 14px;
     font-weight: bold;
+    color: #c9302c;
+}
+
+.stock_price em {
     color: #ff0002;
 }
 

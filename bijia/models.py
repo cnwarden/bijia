@@ -5,8 +5,16 @@ from mongoengine import *
 
 class PriceList(EmbeddedDocument):
     price = StringField()
-    mobile_price = StringField()
-    time = StringField()
+    time = DateTimeField()
+
+class MobilePriceList(EmbeddedDocument):
+    price = StringField()
+    time = DateTimeField()
+
+class Degree(EmbeddedDocument):
+    value = FloatField()
+    scope = IntField()
+    change_time = DateTimeField()
 
 class Stock(Document):
     uid = IntField(required=True)
@@ -15,11 +23,13 @@ class Stock(Document):
     comments = IntField(required=True)
     category = IntField(required=True)
     changed = IntField()
-    create_time = StringField()
+    create_time = DateTimeField()
     last_update = StringField()
     last_price = FloatField()
     last_mobile_price = FloatField()
+    degree = EmbeddedDocumentField(Degree)
     price_list = ListField(EmbeddedDocumentField(PriceList))
+    mobile_price_list = ListField(EmbeddedDocumentField(MobilePriceList))
 
     meta = {'collection' : 'stocks'}
 
