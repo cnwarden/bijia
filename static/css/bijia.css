@@ -94,3 +94,8 @@ footer {
     vertical-align: middle;
     margin-top: 10px;
 }
+
+.social_icon {
+    width: 32px;
+    height: 32px;
+}
