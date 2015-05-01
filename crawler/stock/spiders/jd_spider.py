@@ -94,8 +94,10 @@ class JDSpider(scrapy.Spider):
             return 1
         elif provider_category == '737,752,753':
             return 2
-        else:
+        elif provider_category == '6728,6747,11954':
             return 3
+        else:
+            return 4
 
     def parse(self, response):
         # Get price of item

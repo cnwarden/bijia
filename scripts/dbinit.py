@@ -13,7 +13,9 @@ class DBInit(object):
         self.collection = self.db['category']
 
         items = [ {"name":'平板电视', "value" : 1},
-                  {"name":'电饭煲',   "value" : 2 }]
+                  {"name":'电饭煲',   "value" : 2},
+                  {"name":'胎压监测', "value" : 3},
+                ]
 
         for item in items:
             result = self.collection.find_one({'value':item['value']})
