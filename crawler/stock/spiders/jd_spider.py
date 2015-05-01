@@ -8,6 +8,7 @@ from scrapy.log import INFO
 from datetime import datetime
 from json.decoder import JSONDecoder
 from scrapy.conf import settings
+from scrapy.log import msg
 import os
 
 PRICE_BASE_URL = 'http://p.3.cn/prices/get?skuid='

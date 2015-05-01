@@ -20,6 +20,7 @@ ITEM_PIPELINES = {
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2371.0 Safari/537.36'
 
+LOG_FILE = 'scrapy_crawl.log'
 LOG_LEVEL = 'INFO'
 
 MONGODB_SERVER = '127.0.0.1'

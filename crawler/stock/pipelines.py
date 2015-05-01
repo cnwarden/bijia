@@ -9,6 +9,7 @@ import os
 from pymongo import MongoClient
 
 from scrapy.conf import settings
+from scrapy.log import msg
 from stock.items import JDStockItem, JDStockPrice, JDStockImage, JDStockPromotion
 from datetime import datetime
 
@@ -79,7 +80,7 @@ class StockPipeline(object):
                                         { 'price': result['last_price'], 'time':item['timestamp'] } },
                                 }, True)
         else:
-            print item['uid']
+            msg('mobile->%d' % (item['uid']))
             # update last change time
             if result['last_mobile_price'] != item['mobile_price']:
                 self.collection.update({'uid': item['uid']}, {'$set':{'degree.change_time' : datetime.now()}}, True)
