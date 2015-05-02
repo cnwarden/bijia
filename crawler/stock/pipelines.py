@@ -73,12 +73,12 @@ class StockPipeline(object):
         # update snapshot price
         result = self.collection.find_one({'uid': item['uid']})
         if not item['mobile_price']:
-            if result['last_mobile_price'] == 0.0:
-                self.collection.update({'uid': item['uid']}, {'$set':{'last_mobile_price':result['last_price']}})
-                result = self.collection.update({'uid': item['uid']}, {
-                                '$push' : { 'mobile_price_list' :
-                                        { 'price': result['last_price'], 'time':item['timestamp'] } },
-                                }, True)
+            # first set or mobile price change back to normal price
+            self.collection.update({'uid': item['uid']}, {'$set':{'last_mobile_price':result['last_price']}})
+            result = self.collection.update({'uid': item['uid']}, {
+                            '$push' : { 'mobile_price_list' :
+                                    { 'price': result['last_price'], 'time':item['timestamp'] } },
+                            }, True)
         else:
             msg('mobile->%d' % (item['uid']))
             # update last change time
