@@ -1,7 +1,9 @@
 # coding:utf-8
 #!/usr/bin/python
 
+import sys
 import pymongo
+import getopt
 
 
 class DBInit(object):
@@ -22,9 +24,28 @@ class DBInit(object):
             if not result:
                 self.collection.insert(item)
 
+    def deleteDB(self):
+        self.client.drop_database("jd")
+
+    def close(self):
+        self.client.close()
+
 def main():
     db = DBInit()
-    db.initCategory()
+    try:
+        options,args = getopt.getopt(sys.argv[1:], "hcd", ["help","category","delete_db"])
+        for name,value in options:
+            if name in ("-h", "--help"):
+                pass
+            if name in ("-c", "--category"):
+                db.initCategory()
+            if name in ("-d", "--delete_db"):
+                db.deleteDB()
+    except getopt.GetoptError:
+        sys.exit()
+    finally:
+        db.close()
 
 
-main()
+if __name__ == "__main__":
+    main()

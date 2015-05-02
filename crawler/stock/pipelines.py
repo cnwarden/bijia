@@ -22,8 +22,15 @@ class StockPipeline(object):
         self.db = self.client[settings['MONGODB_DB']]
         self.collection = self.db[settings['MONGODB_COLLECTION']]
 
-    def __evaluate(self):
-        pass
+    def __evaluate(self, uid, **kwargs):
+        self.collection.update({'uid': uid},
+               {'$set':
+                    {
+                        'degree.value' : kwargs['price'] - kwargs['mobile_price'],
+                        'degree.scope' : 0,
+                        'degree.change_time' : kwargs['timestamp']
+                    },
+                }, True)
 
     def __save_image(self, item):
         img_path = os.path.join(settings['JD_IMAGE_PATH'], str(item['uid']) + '.jpg')
@@ -41,81 +48,60 @@ class StockPipeline(object):
             result = self.collection.update({'uid': item['uid']}, {'$set':{'comments':item['comments']}})
 
     def __create_or_update_price(self, item):
-        # update last update time
-        result = self.collection.update({'uid': item['uid']},
-                                        {'$set' : {'last_update': item['timestamp']}}, True)
+        result = self.collection.find_one({'uid': item['uid']})
         if result:
-                result = self.collection.find_one({'uid': item['uid']})
-                # update last change time
-                if result['last_price'] != item['price']:
-                    self.collection.update({'uid': item['uid']}, {'$set':{'degree.change_time' : datetime.now()}}, True)
-                self.collection.update({'uid': item['uid']}, {'$set':{'last_price':item['price']}}, True)
-
-                # check whether update price_list
-                if result.has_key('price_list'):
-                    if result['price_list'][-1]['price'] == item['price']:
-                        pass
-                    else:
-                        result = self.collection.update({'uid': item['uid']}, {
-                            '$push' : { 'price_list' :
-                                { 'price':item['price'], 'time':item['timestamp'] } },
-                            '$set'  : { 'changed' : 1 }
+            if result['last_price'] != item['price']:
+                self.collection.update({'uid': item['uid']},
+                           {'$set':
+                                {
+                                    'last_price' : item['price'],
+                                    'last_update' : item['timestamp']
+                                },
+                            '$push' :
+                                { 'price_list' :
+                                    { 'price':item['price'], 'time':item['timestamp'] }
+                                }
                             }, True)
-                else:
-                    # non-exist then update as default value
-                    result = self.collection.update({'uid': item['uid']}, {
-                        '$push' : { 'price_list' :
-                            { 'price':item['price'], 'time':item['timestamp'] } },
-                        '$set'  : { 'changed' : 0 }
-                        }, True)
 
     def __update_with_promotion(self, item):
         # update snapshot price
         result = self.collection.find_one({'uid': item['uid']})
-        if not item['mobile_price']:
+        if item['mobile_price'] == None:
             # first set or mobile price change back to normal price
             if result['last_price'] != result['last_mobile_price']:
                 self.collection.update({'uid': item['uid']},
                                 {'$set' :
                                      {
                                          'last_mobile_price' : result['last_price'],
-                                         'degree.value' : 0,
-                                         'degree.scope' : 0,
-                                         'degree.change_time' : datetime.now()
+                                         'last_update' : item['timestamp']
                                      },
                                   '$push' : { 'mobile_price_list' :
                                     { 'price': result['last_price'], 'time':item['timestamp'] }}
                                  }, True)
+
+                self.__evaluate(item['uid'],
+                               price=result['last_price'],
+                               mobile_price=result['last_price'],
+                               timestamp=item['timestamp'])
         else:
             msg('mobile->%d' % (item['uid']))
             # update last change time
             if result['last_mobile_price'] != item['mobile_price']:
-                self.collection.update({'uid': item['uid']}, {'$set':{'degree.change_time' : datetime.now()}}, True)
-            # promotion be after the price, set last price to correct one
-            self.collection.update({'uid': item['uid']}, {'$set':{'last_mobile_price':item['mobile_price']}}, True)
-            # update degree
-            self.collection.update({'uid': item['uid']},
-                                {'$set' :
-                                     {
-                                         'degree.value' : result['last_price'] - item['mobile_price'],
-                                         'degree.scope' : 0
-                                     }
-                                 }, True)
+                self.collection.update({'uid': item['uid']},
+                    {
+                        '$set' :
+                            {
+                                'last_mobile_price' : item['mobile_price'],
+                                'last_update' : item['timestamp']
+                            },
 
-            if result.has_key('mobile_price_list'):
-                if result['mobile_price_list'][-1]['price'] == item['mobile_price']:
-                    pass
-                else:
-                    result = self.collection.update({'uid': item['uid']}, {
-                                '$push' : { 'mobile_price_list' :
-                                        {'price':item['mobile_price'], 'time': item['timestamp'] }}
-                                }, True)
-            else:
-                # non-exist then update as default value
-                result = self.collection.update({'uid': item['uid']}, {
-                        '$push' : { 'mobile_price_list' :
-                            { 'price':item['mobile_price'], 'time':item['timestamp'] } },
-                        }, True)
+                        '$push' :{ 'mobile_price_list' : { 'price': item['mobile_price'], 'time':item['timestamp'] }}
+                    }, True)
+
+                self.__evaluate(item['uid'],
+                                price=result['last_price'],
+                                mobile_price=item['mobile_price'],
+                                timestamp=item['timestamp'])
 
     def process_item(self, item, spider):
         if isinstance(item, JDStockPrice):
