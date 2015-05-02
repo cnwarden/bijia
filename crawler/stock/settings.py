@@ -33,3 +33,6 @@ JD_IMAGE_PATH = '/workspace/bijia/static/img/'
 
 if platform.system() == "Windows":
     JD_IMAGE_PATH = 'D:\\991_GitHub\\bijia\\static\\img'
+
+AUTOTHROTTLE_ENABLED = True
+CONCURRENT_REQUESTS_PER_DOMAIN = 1000
