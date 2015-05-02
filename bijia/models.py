@@ -12,6 +12,7 @@ class MobilePriceList(EmbeddedDocument):
     time = DateTimeField()
 
 class Degree(EmbeddedDocument):
+    predict_price = FloatField()
     value = FloatField()
     scope = IntField()
     change_time = DateTimeField()

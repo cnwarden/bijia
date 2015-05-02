@@ -16,6 +16,7 @@ class JDStockItem(scrapy.Item):
     create_time = scrapy.Field()
     changed = scrapy.Field()
     degree = scrapy.Field()
+    predict_price = scrapy.Field()
     ###
     last_price = scrapy.Field()
     last_mobile_price = scrapy.Field()
@@ -31,7 +32,14 @@ class JDStockImage(scrapy.Item):
     uid = scrapy.Field()
     data = scrapy.Field()
 
-class JDStockPromotion(scrapy.Item):
+class JDStockMobilePrice(scrapy.Item):
     uid = scrapy.Field()
     mobile_price = scrapy.Field()
     timestamp = scrapy.Field()
+
+class JDStockPromotion(scrapy.Item):
+    rebate = scrapy.Field()
+
+class JDStockPromotionList(scrapy.Item):
+    uid = scrapy.Field()
+    promotionList = scrapy.Field()

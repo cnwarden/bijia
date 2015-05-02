@@ -13,7 +13,7 @@
         <span class="stock_price">
             {{ stock.last_price }} 移动端 {{ stock.last_mobile_price }}
             {% if display_method == '1' %}
-                值度: <em>{{ stock.degree.value }}</em>
+                预测价格: {{ stock.degree.predict_price }} 值度: <em>{{ stock.degree.value }}</em>
             {% endif %}
         </span>
         <span class="stock_update_time">

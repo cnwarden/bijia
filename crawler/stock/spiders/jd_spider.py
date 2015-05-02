@@ -2,7 +2,7 @@ import scrapy
 import re
 import codecs
 from stock.settings import *
-from stock.items import JDStockItem, JDStockPrice, JDStockImage, JDStockPromotion
+from stock.items import *
 from scrapy.http import Request
 from scrapy.log import INFO
 from datetime import datetime
@@ -71,7 +71,7 @@ class JDSpider(scrapy.Spider):
         return item
 
     def generate_mobile_price_item(self, uid, price):
-        item = JDStockPromotion()
+        item = JDStockMobilePrice()
         item['uid'] = uid
         item['mobile_price'] = price
         item['timestamp'] = datetime.now()
@@ -118,6 +118,12 @@ class JDSpider(scrapy.Spider):
             return
 
         if(response.meta.has_key('stock_promotion')):
+            itemList = JDStockPromotionList()
+            itemList['uid'] = int(response.meta['stock_id'])
+            itemList['promotionList'] = []
+
+            mobile_price = None
+
             m = re.match('Promotions.set\((.*)\);', response.body)
             if m:
                 content = m.group(1)
@@ -125,9 +131,18 @@ class JDSpider(scrapy.Spider):
                     promotion_obj = JSONDecoder().decode(content)
                     mpt = promotion_obj['mpt']
                     if mpt:
-                        yield self.generate_mobile_price_item(int(response.meta['stock_id']), float(mpt.split(',')[0]))
-                        return
-            yield self.generate_mobile_price_item(int(response.meta['stock_id']), None)
+                        mobile_price = float(mpt.split(',')[0])
+
+                    promotionInfoList = promotion_obj['promotionInfoList']
+                    if promotionInfoList:
+                        for promotion in promotionInfoList:
+                            if promotion['rebate']:
+                                item = JDStockPromotion()
+                                item['rebate'] = promotion['rebate']
+                                itemList['promotionList'].append(item)
+
+            yield self.generate_mobile_price_item(int(response.meta['stock_id']), mobile_price)
+            yield itemList
             return
 
         for stock in response.xpath('//li[@index]'):

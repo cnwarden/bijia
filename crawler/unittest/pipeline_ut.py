@@ -10,7 +10,7 @@ from pymongo import MongoClient
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from stock.pipelines import StockPipeline
-from stock.items import JDStockItem, JDStockPrice, JDStockImage, JDStockPromotion
+from stock.items import JDStockItem, JDStockPrice, JDStockImage, JDStockPromotion, JDStockMobilePrice, JDStockPromotionList
 
 class PiplelineUnitTest(unittest.TestCase):
 
@@ -43,10 +43,21 @@ class PiplelineUnitTest(unittest.TestCase):
         return item
 
     def __generate_mock_mobile_stock_price(self, uid, price, time):
-        item = JDStockPromotion()
+        item = JDStockMobilePrice()
         item['uid'] = uid
         item['mobile_price'] = price
         item['timestamp'] = time
+        return item
+
+    def __generate_mock_promotion(self, uid):
+        item = JDStockPromotionList()
+        item['uid'] = uid
+        item['promotionList'] = []
+
+        z = JDStockPromotion()
+        z['rebate'] = 0.85
+        item['promotionList'].append(z)
+
         return item
 
     def test_case_1_create_single_item(self):
@@ -126,10 +137,10 @@ class PiplelineUnitTest(unittest.TestCase):
         self.pipeline.process_item(self.__generate_mock_stock_price(1, 1000.0, now), None)
         self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=5)), None)
         self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 1010.0, now+timedelta(seconds=10)), None)
+        self.pipeline.process_item(self.__generate_mock_promotion(1), None)
 
         result = self.collection.find_one({'uid': 1})
-        self.assertEqual(result['degree']['value'], -10.0)
-        self.assertEqual(result['degree']['change_time'], now+timedelta(seconds=10))
+        self.assertEqual(result['degree']['value'], 150.0)
 
     def test_case_8_trigger_degree_calculate_back(self):
         now = datetime.now()
@@ -139,10 +150,10 @@ class PiplelineUnitTest(unittest.TestCase):
         self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=5)), None)
         self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 1010.0, now+timedelta(seconds=10)), None)
         self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=15)), None)
+        self.pipeline.process_item(self.__generate_mock_promotion(1), None)
 
         result = self.collection.find_one({'uid': 1})
         self.assertEqual(result['degree']['value'], 0)
-        self.assertEqual(result['degree']['change_time'], now+timedelta(seconds=15))
 
     def tearDown(self):
         self.client.close()
