@@ -30,6 +30,16 @@
     </div>
     {% endfor %}
 
+    <div class="pagination">
+        {% if stock_list.has_previous %}
+            <a href="?provider={{ provider }}&category={{ category }}&show={{ display_method }}&page={{ stock_list.previous_page_number }}">上一页</a>
+        {% endif %}
+        第{{ stock_list.number }}页 / 共{{ stock_list.paginator.num_pages }}页
+        {% if stock_list.has_next %}
+            <a href="?provider={{ provider }}&category={{ category }}&show={{ display_method }}&page={{ stock_list.next_page_number }}">下一页</a>
+        {% endif %}
+    </div>
+
 {% endblock %}
 
 </body>
