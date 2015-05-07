@@ -81,13 +81,13 @@ class JDSpider(scrapy.Spider):
     def generate_promotion_query_url(self, stock_id):
         return 'http://pi.3.cn/promoinfo/get?id=%s&origin=1&callback=Promotions.set' % (stock_id)
 
-    def generate_item(self, stock):
+    def generate_item(self, stock, category):
         item = JDStockItem()
         item['uid'] = int(stock[0])
         item['name'] = stock[1]
         item['url'] = stock[2]
         item['comments'] = int(stock[4])
-        item['category'] = self.get_category(self.category)
+        item['category'] = self.get_category(category)
         item['changed'] = 0
         item['last_update'] = datetime.now()
         item['last_price'] = float(0.0)
@@ -167,14 +167,14 @@ class JDSpider(scrapy.Spider):
             if stock_tab_items:
                 for single_item in stock_tab_items:
                     item = self.extract_single_stock(single_item)
-                    yield self.generate_item(item)
+                    yield self.generate_item(item, response.meta['category'])
                     if not self.is_stock_img_exist(item[0]):
                         yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]}, priority=PRIORITY_IMAGE)
                     yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
                               meta={'stock_price':1, 'stock_promotion_url':self.generate_promotion_query_url(item[0])})
             else:
                 item = self.extract_single_stock(stock)
-                yield self.generate_item(item)
+                yield self.generate_item(item, response.meta['category'])
                 if not self.is_stock_img_exist(item[0]):
                     yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]}, priority=PRIORITY_IMAGE)
                 yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
@@ -185,5 +185,5 @@ class JDSpider(scrapy.Spider):
             next_page = next_page_nodes[0].xpath('@href').extract()[0]
             next_page_url = "http://list.jd.com%s" % (next_page)
             #self.log(next_page_url, INFO)
-            r = Request(url=next_page_url, priority=PRIORITY_PAGE)
+            r = Request(url=next_page_url, priority=PRIORITY_PAGE, meta={'category' : response.meta['category']})
             yield  r
