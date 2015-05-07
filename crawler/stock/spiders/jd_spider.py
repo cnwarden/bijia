@@ -10,6 +10,7 @@ from json.decoder import JSONDecoder
 from scrapy.conf import settings
 from scrapy.log import msg
 import os
+from pymongo import MongoClient
 
 PRICE_BASE_URL = 'http://p.3.cn/prices/get?skuid='
 
@@ -24,10 +25,39 @@ class JDSpider(scrapy.Spider):
 
     def __init__(self, category=None, *args, **kwargs):
         super(JDSpider, self).__init__(*args, **kwargs)
-        
+
         self.log(category, INFO)
-        self.start_urls.append('http://list.jd.com/list.html?cat=%s&page=1&&delivery=1&JL=6_0_0' % (category))
+        for url in self.generate_root_url_by_configuration():
+            self.start_urls.append(url)
         self.category = category
+
+    def generate_root_url_by_configuration(self):
+        self.client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
+        self.db = self.client[settings['MONGODB_DB']]
+        self.collection = self.db['category']
+
+        items = self.collection.aggregate([
+            {"$unwind":"$provider"},
+            {"$match":{"provider.name":"jd"}},
+            {"$group": {
+                "_id":"$_id",
+                "name": {'$first': '$name'},
+                "value": {'$first': '$value'},
+                "param1": {'$first': '$provider.param1'},
+            }}
+        ])
+
+        self.category_mapping = {}
+        for item in items['result']:
+            self.category_mapping[item['param1']] = int(item['value'])
+            yield "http://list.jd.com/list.html?cat=%s&page=1&&delivery=1&JL=6_0_0" % (item["param1"])
+
+    def get_category(self, provider_category):
+        """
+        convert jd category to standard category
+        :return: the value of standard category
+        """
+        return self.category_mapping[provider_category]
 
     def make_requests_from_url(self, url):
         return Request(url, dont_filter=True, meta={'category' : self.category})
@@ -85,20 +115,6 @@ class JDSpider(scrapy.Spider):
 
     def is_stock_img_exist(self, uid):
         return os.path.exists(os.path.join(settings['JD_IMAGE_PATH'], '%s.jpg' % (uid)))
-
-    def get_category(self, provider_category):
-        """
-        convert jd category to standard category
-        :return: the value of standard category
-        """
-        if provider_category == '737,794,798':
-            return 1
-        elif provider_category == '737,752,753':
-            return 2
-        elif provider_category == '6728,6747,11954':
-            return 3
-        else:
-            return 4
 
     def parse(self, response):
         # Get price of item

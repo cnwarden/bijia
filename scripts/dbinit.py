@@ -14,9 +14,10 @@ class DBInit(object):
     def initCategory(self):
         self.collection = self.db['category']
 
-        items = [ {"name":'平板电视', "value" : 1},
-                  {"name":'电饭煲',   "value" : 2},
-                  {"name":'胎压监测', "value" : 3},
+        items = [ {"name":'平板电视', "value" : 1, "provider": [{"name":"jd", "param1":"737,794,798"}]},
+                  {"name":'电饭煲',   "value" : 2, "provider": [{"name":"jd", "param1":"737,752,753"}]},
+                  {"name":'胎压监测', "value" : 3, "provider": [{"name":"jd", "param1":"6728,6747,11954"}]},
+                  {"name":'牛奶', "value" : 4, "provider": [{"name":"jd", "param1":"1320,5019,12215"}]},
                 ]
 
         for item in items:
