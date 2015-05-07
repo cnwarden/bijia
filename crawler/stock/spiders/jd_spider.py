@@ -60,7 +60,8 @@ class JDSpider(scrapy.Spider):
         return self.category_mapping[provider_category]
 
     def make_requests_from_url(self, url):
-        return Request(url, dont_filter=True, meta={'category' : self.category})
+        m = re.search('cat=(.*?)&', url)
+        return Request(url, dont_filter=True, meta={'category' : m.group(1)})
 
     def extract_single_stock(self, node):
         #price_class = node.xpath('.//div[@class="p-price"]/strong/@class').extract()[0]
