@@ -34,9 +34,15 @@ class Stock(Document):
 
     meta = {'collection' : 'stocks'}
 
+
+class Provider(EmbeddedDocument):
+    name = StringField(max_length=200, required=True)
+    param1 = StringField(max_length=200, required=True)
+
 class Category(Document):
     name = StringField(max_length=200, required=True)
     value = IntField(required=True)
+    provider = ListField(EmbeddedDocumentField(Provider))
 
     meta = {'collection' : 'category'}
 
