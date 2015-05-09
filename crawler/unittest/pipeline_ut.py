@@ -77,20 +77,7 @@ class PiplelineUnitTest(unittest.TestCase):
         self.assertEqual(result['price_list'][-1]['price'], 1000)
         self.assertEqual(result['last_update'], now)
 
-    def test_case_3_update_last_mobile_price_with_None(self):
-        now = datetime.now()
-
-        self.pipeline.process_item(self.__generate_mock_stock(1), None)
-        self.pipeline.process_item(self.__generate_mock_stock_price(1, 1000.0, now), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=5)), None) # with None
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=10)), None) # with None
-
-        result = self.collection.find_one({'uid': 1})
-        self.assertEqual(result['last_mobile_price'], 1000)
-        self.assertEqual(result['mobile_price_list'][-1]['price'], 1000)
-        self.assertEqual(result['last_update'], now+timedelta(seconds=5))
-
-    def test_case_4_update_last_mobile_price(self):
+    def test_case_3_update_last_mobile_price(self):
         now = datetime.now()
 
         self.pipeline.process_item(self.__generate_mock_stock(1), None)
@@ -103,7 +90,7 @@ class PiplelineUnitTest(unittest.TestCase):
         self.assertEqual(result['mobile_price_list'][-1]['price'], 1000)
         self.assertEqual(result['last_update'], now+timedelta(seconds=5))
 
-    def test_case_5_update_last_mobile_price_changed(self):
+    def test_case_4_update_last_mobile_price_changed(self):
         now = datetime.now()
 
         self.pipeline.process_item(self.__generate_mock_stock(1), None)
@@ -116,21 +103,7 @@ class PiplelineUnitTest(unittest.TestCase):
         self.assertEqual(result['mobile_price_list'][-1]['price'], 1010)
         self.assertEqual(result['last_update'], now+timedelta(seconds=10))
 
-    def test_case_6_update_last_mobile_price_changed_back(self):
-        now = datetime.now()
-
-        self.pipeline.process_item(self.__generate_mock_stock(1), None)
-        self.pipeline.process_item(self.__generate_mock_stock_price(1, 1000.0, now), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=5)), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 1010.0, now+timedelta(seconds=10)), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=15)), None)
-
-        result = self.collection.find_one({'uid': 1})
-        self.assertEqual(result['last_mobile_price'], 1000)
-        self.assertEqual(result['mobile_price_list'][-1]['price'], 1000)
-        self.assertEqual(result['last_update'], now+timedelta(seconds=15))
-
-    def test_case_7_trigger_degree_calculate(self):
+    def test_case_5_trigger_degree_calculate(self):
         now = datetime.now()
 
         self.pipeline.process_item(self.__generate_mock_stock(1), None)
@@ -141,19 +114,6 @@ class PiplelineUnitTest(unittest.TestCase):
 
         result = self.collection.find_one({'uid': 1})
         self.assertEqual(result['degree']['value'], 150.0)
-
-    def test_case_8_trigger_degree_calculate_back(self):
-        now = datetime.now()
-
-        self.pipeline.process_item(self.__generate_mock_stock(1), None)
-        self.pipeline.process_item(self.__generate_mock_stock_price(1, 1000.0, now), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=5)), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 1010.0, now+timedelta(seconds=10)), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=15)), None)
-        self.pipeline.process_item(self.__generate_mock_promotion(1), None)
-
-        result = self.collection.find_one({'uid': 1})
-        self.assertEqual(result['degree']['value'], 0)
 
     def tearDown(self):
         self.client.close()

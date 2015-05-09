@@ -68,32 +68,18 @@ class StockPipeline(object):
     def __update_with_mobile_price(self, item):
         # update snapshot price
         result = self.collection.find_one({'uid': item['uid']})
-        if item['mobile_price'] == None:
-            # first set or mobile price change back to normal price
-            if result['last_price'] != result['last_mobile_price']:
-                self.collection.update({'uid': item['uid']},
-                                {'$set' :
-                                     {
-                                         'last_mobile_price' : result['last_price'],
-                                         'last_update' : item['timestamp']
-                                     },
-                                  '$push' : { 'mobile_price_list' :
-                                    { 'price': result['last_price'], 'time':item['timestamp'] }}
-                                 }, True)
-        else:
-            msg('mobile->%d' % (item['uid']))
-            # update last change time
-            if result['last_mobile_price'] != item['mobile_price']:
-                self.collection.update({'uid': item['uid']},
-                    {
-                        '$set' :
-                            {
-                                'last_mobile_price' : item['mobile_price'],
-                                'last_update' : item['timestamp']
-                            },
+        # update last change time
+        if result['last_mobile_price'] != item['mobile_price']:
+            self.collection.update({'uid': item['uid']},
+                {
+                    '$set' :
+                        {
+                            'last_mobile_price' : item['mobile_price'],
+                            'last_update' : item['timestamp']
+                        },
 
-                        '$push' :{ 'mobile_price_list' : { 'price': item['mobile_price'], 'time':item['timestamp'] }}
-                    }, True)
+                    '$push' :{ 'mobile_price_list' : { 'price': item['mobile_price'], 'time':item['timestamp'] }}
+                }, True)
 
     def __update_promotion(self, item):
         uid = item['uid']

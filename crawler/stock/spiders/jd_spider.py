@@ -2,7 +2,7 @@ import scrapy
 import re
 import codecs
 from stock.settings import *
-from stock.items import *
+from stock.items import JDStockItem, JDStockPrice, JDStockMobilePrice, JDStockImage, JDStockPromotion, JDStockPromotionList
 from scrapy.http import Request
 from scrapy.log import INFO
 from datetime import datetime
@@ -17,7 +17,7 @@ PRICE_BASE_URL = 'http://p.3.cn/prices/get?skuid='
 PRIORITY_PAGE = 1000
 PRIORITY_PRICE = 500
 PRIORITY_MOBILE_PRICE = 200
-PRIORITY_IMAGE = 100
+PRIORITY_PROMOTION_PRICE = 150
 
 class JDSpider(scrapy.Spider):
     name = "jd_web"
@@ -78,6 +78,9 @@ class JDSpider(scrapy.Spider):
     def generate_price_query_url(self, stock_id):
         return 'http://p.3.cn/prices/get?skuid=J_%s' % (stock_id)
 
+    def generate_mobile_price_query_url(self, stock_id):
+        return 'http://item.m.jd.com/product/%s.html' % (stock_id)
+
     def generate_promotion_query_url(self, stock_id):
         return 'http://pi.3.cn/promoinfo/get?id=%s&origin=1&callback=Promotions.set' % (stock_id)
 
@@ -103,8 +106,8 @@ class JDSpider(scrapy.Spider):
 
     def generate_mobile_price_item(self, uid, price):
         item = JDStockMobilePrice()
-        item['uid'] = uid
-        item['mobile_price'] = price
+        item['uid'] = int(uid)
+        item['mobile_price'] = round(float(price), 2)
         item['timestamp'] = datetime.now()
         return item
 
@@ -122,10 +125,18 @@ class JDSpider(scrapy.Spider):
         if(response.meta.has_key('stock_price')):
             price_obj = JSONDecoder().decode(response.body)
             #remove the prefix J_
-            yield self.generate_price_item((price_obj[0]['id'][2:], price_obj[0]['p']))
-            yield Request(url=response.meta['stock_promotion_url'],
-                    meta={'stock_promotion':1, 'stock_id':int(price_obj[0]['id'][2:])}, priority=PRIORITY_MOBILE_PRICE)
+            stock_id_str = price_obj[0]['id'][2:]
+            yield self.generate_price_item((stock_id_str, price_obj[0]['p']))
+            yield Request(url=self.generate_mobile_price_query_url(stock_id_str),
+                    meta={'stock_mobile_price':1, 'stock_id':stock_id_str}, priority=PRIORITY_MOBILE_PRICE)
             return
+
+        if(response.meta.has_key('stock_mobile_price')):
+            m_price = response.xpath('//span[@class="p-price"]/text()').extract()[0][1:]
+
+            yield self.generate_mobile_price_item(response.meta['stock_id'], m_price);
+            yield Request(url=self.generate_promotion_query_url(response.meta['stock_id']),
+                    meta={'stock_promotion':1, 'stock_id':response.meta['stock_id']}, priority=PRIORITY_PROMOTION_PRICE)
 
         if(response.meta.has_key('stock_img')):
             item = JDStockImage()
@@ -139,17 +150,11 @@ class JDSpider(scrapy.Spider):
             itemList['uid'] = int(response.meta['stock_id'])
             itemList['promotionList'] = []
 
-            mobile_price = None
-
             m = re.match('Promotions.set\((.*)\);', response.body)
             if m:
                 content = m.group(1)
                 if content != "":
                     promotion_obj = JSONDecoder().decode(content)
-                    mpt = promotion_obj['mpt']
-                    if mpt:
-                        mobile_price = float(mpt.split(',')[0])
-
                     promotionInfoList = promotion_obj['promotionInfoList']
                     if promotionInfoList:
                         for promotion in promotionInfoList:
@@ -157,8 +162,6 @@ class JDSpider(scrapy.Spider):
                                 item = JDStockPromotion()
                                 item['rebate'] = promotion['rebate']
                                 itemList['promotionList'].append(item)
-
-            yield self.generate_mobile_price_item(int(response.meta['stock_id']), mobile_price)
             yield itemList
             return
 
@@ -169,16 +172,16 @@ class JDSpider(scrapy.Spider):
                     item = self.extract_single_stock(single_item)
                     yield self.generate_item(item, response.meta['category'])
                     if not self.is_stock_img_exist(item[0]):
-                        yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]}, priority=PRIORITY_IMAGE)
+                        yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
                     yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
-                              meta={'stock_price':1, 'stock_promotion_url':self.generate_promotion_query_url(item[0])})
+                              meta={'stock_price':1})
             else:
                 item = self.extract_single_stock(stock)
                 yield self.generate_item(item, response.meta['category'])
                 if not self.is_stock_img_exist(item[0]):
-                    yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]}, priority=PRIORITY_IMAGE)
+                    yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
                 yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
-                              meta={'stock_price':1, 'stock_promotion_url':self.generate_promotion_query_url(item[0])})
+                              meta={'stock_price':1})
 
         next_page_nodes = response.xpath('//a[@class="pn-next"]')
         if next_page_nodes:
