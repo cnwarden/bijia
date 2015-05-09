@@ -88,9 +88,10 @@ class StockPipeline(object):
         final_price = min_price
         if result:
             for promotion in item['promotionList']:
-                rebate = promotion['rebate']
-                price_after_rebate = min_price * rebate
-                final_price = price_after_rebate if final_price > price_after_rebate else final_price
+                if promotion['type'] == 1:
+                    rebate = promotion['rebate']
+                    price_after_rebate = min_price * rebate
+                    final_price = price_after_rebate if final_price > price_after_rebate else final_price
 
         self.__evaluate(item['uid'],
                        price=result['last_price'],

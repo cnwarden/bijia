@@ -38,7 +38,11 @@ class JDStockMobilePrice(scrapy.Item):
     timestamp = scrapy.Field()
 
 class JDStockPromotion(scrapy.Item):
+    type = scrapy.Field()
     rebate = scrapy.Field()
+
+    needMoney = scrapy.Field()
+    reward = scrapy.Field()
 
 class JDStockPromotionList(scrapy.Item):
     uid = scrapy.Field()

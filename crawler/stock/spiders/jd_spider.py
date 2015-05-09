@@ -11,6 +11,7 @@ from scrapy.conf import settings
 from scrapy.log import msg
 import os
 from pymongo import MongoClient
+from stock.job import Job
 
 PRICE_BASE_URL = 'http://p.3.cn/prices/get?skuid='
 
@@ -30,6 +31,10 @@ class JDSpider(scrapy.Spider):
         for url in self.generate_root_url_by_configuration():
             self.start_urls.append(url)
         self.category = category
+
+        self.job = Job()
+
+        #self.promotion_log = open('promotion.log', 'w')
 
     def generate_root_url_by_configuration(self):
         self.client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
@@ -60,6 +65,7 @@ class JDSpider(scrapy.Spider):
         return self.category_mapping[provider_category]
 
     def make_requests_from_url(self, url):
+        self.job.log_start()
         m = re.search('cat=(.*?)&', url)
         return Request(url, dont_filter=True, meta={'stock_page':1, 'category' : m.group(1)})
 
@@ -158,13 +164,32 @@ class JDSpider(scrapy.Spider):
             if m:
                 content = m.group(1)
                 if content != "":
+                    #debug
+                    #self.promotion_log.write(content+"\n\n")
+
                     promotion_obj = JSONDecoder().decode(content)
                     promotionInfoList = promotion_obj['promotionInfoList']
                     if promotionInfoList:
                         for promotion in promotionInfoList:
+                            """
+                            promoType
+                                1       满额返券满1万元送500元京东E卡
+                                4       有赠品
+                                10      满减
+
+                                set : 1 as rebate now
+                            """
+
                             if promotion['rebate']:
                                 item = JDStockPromotion()
+                                item['type'] = 1
                                 item['rebate'] = promotion['rebate']
+                                itemList['promotionList'].append(item)
+                            if promotion['needMondey'] and promotion['reward']:
+                                item = JDStockPromotion()
+                                item['type'] = promotion['promoType'] # 10 is 满减
+                                item['needMoney'] = float(promotion['needMondey'])
+                                item['reward'] = float(promotion['reward'])
                                 itemList['promotionList'].append(item)
             yield itemList
             return
