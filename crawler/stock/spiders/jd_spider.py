@@ -111,7 +111,6 @@ class JDSpider(scrapy.Spider):
             item['mobile_price'] = round(float(price), 2)
         except UnicodeEncodeError:
             self.log("UnicodeEncodeError-->SKU:%s mobile price %s can't decode" % (uid, price))
-        finally:
             item['mobile_price'] = -1.00
         item['timestamp'] = datetime.now()
         return item
