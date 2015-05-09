@@ -49,6 +49,13 @@ class PiplelineUnitTest(unittest.TestCase):
         item['timestamp'] = time
         return item
 
+    def __generate_mock_promotion_none(self, uid):
+        item = JDStockPromotionList()
+        item['uid'] = uid
+        item['promotionList'] = []
+
+        return item
+
     def __generate_mock_promotion(self, uid):
         item = JDStockPromotionList()
         item['uid'] = uid
@@ -108,12 +115,22 @@ class PiplelineUnitTest(unittest.TestCase):
 
         self.pipeline.process_item(self.__generate_mock_stock(1), None)
         self.pipeline.process_item(self.__generate_mock_stock_price(1, 1000.0, now), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, None, now+timedelta(seconds=5)), None)
-        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 1010.0, now+timedelta(seconds=10)), None)
+        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 900.0, now+timedelta(seconds=10)), None)
         self.pipeline.process_item(self.__generate_mock_promotion(1), None)
 
         result = self.collection.find_one({'uid': 1})
-        self.assertEqual(result['degree']['value'], 150.0)
+        self.assertEqual(result['degree']['value'], 235.0)
+
+    def test_case_6_trigger_degree_calculate_none(self):
+        now = datetime.now()
+
+        self.pipeline.process_item(self.__generate_mock_stock(1), None)
+        self.pipeline.process_item(self.__generate_mock_stock_price(1, 1000.0, now), None)
+        self.pipeline.process_item(self.__generate_mock_mobile_stock_price(1, 900.0, now+timedelta(seconds=10)), None)
+        self.pipeline.process_item(self.__generate_mock_promotion_none(1), None)
+
+        result = self.collection.find_one({'uid': 1})
+        self.assertEqual(result['degree']['value'], 100.0)
 
     def tearDown(self):
         self.client.close()

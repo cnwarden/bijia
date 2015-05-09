@@ -61,7 +61,7 @@ class JDSpider(scrapy.Spider):
 
     def make_requests_from_url(self, url):
         m = re.search('cat=(.*?)&', url)
-        return Request(url, dont_filter=True, meta={'category' : m.group(1)})
+        return Request(url, dont_filter=True, meta={'stock_page':1, 'category' : m.group(1)})
 
     def extract_single_stock(self, node):
         #price_class = node.xpath('.//div[@class="p-price"]/strong/@class').extract()[0]
@@ -107,7 +107,12 @@ class JDSpider(scrapy.Spider):
     def generate_mobile_price_item(self, uid, price):
         item = JDStockMobilePrice()
         item['uid'] = int(uid)
-        item['mobile_price'] = round(float(price), 2)
+        try:
+            item['mobile_price'] = round(float(price), 2)
+        except UnicodeEncodeError:
+            self.log("UnicodeEncodeError-->SKU:%s mobile price %s can't decode" % (uid, price))
+        finally:
+            item['mobile_price'] = -1.00
         item['timestamp'] = datetime.now()
         return item
 
@@ -165,28 +170,31 @@ class JDSpider(scrapy.Spider):
             yield itemList
             return
 
-        for stock in response.xpath('//li[@index]'):
-            stock_tab_items = stock.xpath('.//div[contains(@class, "tab-content-item")]')
-            if stock_tab_items:
-                for single_item in stock_tab_items:
-                    item = self.extract_single_stock(single_item)
+        if(response.meta.has_key('stock_page')):
+            for stock in response.xpath('//li[@index]'):
+                stock_tab_items = stock.xpath('.//div[contains(@class, "tab-content-item")]')
+                if stock_tab_items:
+                    for single_item in stock_tab_items:
+                        item = self.extract_single_stock(single_item)
+                        yield self.generate_item(item, response.meta['category'])
+                        if not self.is_stock_img_exist(item[0]):
+                            yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
+                        yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
+                                  meta={'stock_price':1})
+                else:
+                    item = self.extract_single_stock(stock)
                     yield self.generate_item(item, response.meta['category'])
                     if not self.is_stock_img_exist(item[0]):
                         yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
                     yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
-                              meta={'stock_price':1})
-            else:
-                item = self.extract_single_stock(stock)
-                yield self.generate_item(item, response.meta['category'])
-                if not self.is_stock_img_exist(item[0]):
-                    yield Request(url=item[3], meta={'stock_img':1, 'stock_id':item[0]})
-                yield Request(url=self.generate_price_query_url(item[0]), priority=PRIORITY_PRICE,
-                              meta={'stock_price':1})
+                                  meta={'stock_price':1})
 
-        next_page_nodes = response.xpath('//a[@class="pn-next"]')
-        if next_page_nodes:
-            next_page = next_page_nodes[0].xpath('@href').extract()[0]
-            next_page_url = "http://list.jd.com%s" % (next_page)
-            #self.log(next_page_url, INFO)
-            r = Request(url=next_page_url, priority=PRIORITY_PAGE, meta={'category' : response.meta['category']})
-            yield  r
+            next_page_nodes = response.xpath('//a[@class="pn-next"]')
+            if next_page_nodes:
+                next_page = next_page_nodes[0].xpath('@href').extract()[0]
+                next_page_url = "http://list.jd.com%s" % (next_page)
+                #self.log(next_page_url, INFO)
+                r = Request(url=next_page_url, priority=PRIORITY_PAGE,
+                            meta={'stock_page':1, 'category' : response.meta['category']})
+                yield  r
+            return
