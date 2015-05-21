@@ -70,7 +70,7 @@ def addipview(request):
     fp = open('hosts', 'w')
     fp.write(serverip)
     fp.close()
-    return HttpResponse("<h1>%s</h1>" % (serverip))
+    return HttpResponse("%s" % (serverip))
 
 
 def serverview(request):
