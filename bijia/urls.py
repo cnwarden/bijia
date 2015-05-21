@@ -6,4 +6,6 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^index', 'bijia.views.stocklistview'),
+    url(r'^addip', 'bijia.views.addipview'),
+    url(r'^ip',    'bijia.views.serverview'),
 )

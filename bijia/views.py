@@ -10,6 +10,7 @@ from bijia.models import Stock, Category
 from django.shortcuts import render_to_response
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from datetime import datetime
+import os
 
 ITEMS_IN_SINGLE_PAGE = 20
 
@@ -62,3 +63,20 @@ def stocklistview(request):
                                            })
     else:
         return render_to_response('base.html')
+
+
+def addipview(request):
+    serverip = request.GET.get('ip', '127.0.0.1')
+    fp = open('hosts', 'w')
+    fp.write(serverip)
+    fp.close()
+    return HttpResponse("<h1>%s</h1>" % (serverip))
+
+
+def serverview(request):
+    serverip = None
+    if os.path.exists('hosts'):
+        fp = open('hosts', 'r')
+        serverip = fp.readline()
+        fp.close()
+    return HttpResponse("<h1>LINODE IP ADDRESS:%s</h1>" % (serverip))
