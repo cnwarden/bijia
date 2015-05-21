@@ -70,7 +70,7 @@ def addipview(request):
     fp = open('hosts', 'w')
     fp.write(serverip)
     fp.close()
-    return HttpResponse("%s" % (serverip))
+    return HttpResponse("<h1>ADDED:%s</h1>" % (serverip))
 
 
 def serverview(request):
@@ -79,4 +79,4 @@ def serverview(request):
         fp = open('hosts', 'r')
         serverip = fp.readline()
         fp.close()
-    return HttpResponse("<h1>LINODE IP ADDRESS:%s</h1>" % (serverip))
+    return HttpResponse("%s" % (serverip))
