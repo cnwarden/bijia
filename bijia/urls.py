@@ -6,6 +6,8 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^index', 'bijia.views.stocklistview'),
+    url(r'^weibo', 'bijia.views.weibologinview'),
+    url(r'^post',  'bijia.views.msgpostview'),
     url(r'^addip', 'bijia.views.addipview'),
     url(r'^ip',    'bijia.views.serverview'),
 )

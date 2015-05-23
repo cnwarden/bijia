@@ -59,9 +59,18 @@
             <li class="nav-link">
                 <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=5>移动好价</a>
             </li>
+            {% if logined %}
             <li class="nav-link">
-                <a href=/bijia/index?provider={{ provider }}&category={{ category }}>联系我们</a>
+                {{ name }}
             </li>
+            <li class="nav-link">
+                <a href=/bijia/post>发微博</a>
+            </li>
+            {% else %}
+            <li class="nav-link">
+                <a href="https://api.weibo.com/oauth2/authorize?client_id=433156516&response_type=code&redirect_uri={{ redirect_url }}">登陆</a>
+            </li>
+            {% endif %}
         </ul>
     </div>
 {% endblock %}

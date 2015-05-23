@@ -50,6 +50,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
 ROOT_URLCONF = 'appstore.urls'
 
 WSGI_APPLICATION = 'appstore.wsgi.application'
@@ -95,3 +97,7 @@ MONGO_DATABASE_NAME = 'jd'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
 connect(MONGO_DATABASE_NAME, host=MONGO_HOST, port=MONGO_PORT)
+
+
+#WEIBO_REDIRECT_URL='http://127.0.0.1/bijia/weibo'
+WEIBO_REDIRECT_URL='http://www.xierqi.net/bijia/weibo'

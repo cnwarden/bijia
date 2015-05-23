@@ -10,15 +10,30 @@ from bijia.models import Stock, Category
 from django.shortcuts import render_to_response
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from datetime import datetime
-import os
+from django.http import HttpResponseRedirect
+import os, urllib, urllib2
+from json import JSONDecoder
+from appstore.settings import WEIBO_REDIRECT_URL
 
 ITEMS_IN_SINGLE_PAGE = 20
 
+APP_KEY = '433156516'
+APP_SECRET = '73e92bf8321e5241d717735f30baa1f5'
+
 def stocklistview(request):
+    #user_info
+    logined = request.session.get('logined', False)
+    name = request.session.get('name', '')
+
+
+
+
     provider = request.GET.get('provider', 'jd')
     category = request.GET.get('category', '1')
     display_method = request.GET.get('show', '1')
     page = request.GET.get('page', 1)
+
+    redirect_url = WEIBO_REDIRECT_URL
 
     # read db categories
     categories = Category.objects.all()
@@ -59,11 +74,79 @@ def stocklistview(request):
                                            'category_list' : categories,
                                            'provider' : 'jd',
                                            'category' : int(category),
-                                           'display_method' : display_method
+                                           'display_method' : display_method,
+
+                                           'logined' : logined,
+                                           'name' : name,
+                                           'redirect_url' : redirect_url,
                                            })
     else:
         return render_to_response('base.html')
 
+def weibologinview(request):
+    if not request.session.get('logined', False):
+        code = request.GET.get('code','')
+
+        url = 'https://api.weibo.com/oauth2/access_token'
+
+        data = {'client_id':APP_KEY,
+                'client_secret':APP_SECRET,
+                'grant_type':'authorization_code',
+                'redirect_uri':WEIBO_REDIRECT_URL,
+                'code':code}
+
+        post_data = urllib.urlencode(data)
+
+        req = urllib2.Request(url, data=post_data)
+        req.add_header('Content-Type', "application/x-www-form-urlencoded")
+        response = urllib2.urlopen(req)
+        data = response.read()
+
+        decoder = JSONDecoder().decode(data)
+        access_token = decoder['access_token']
+        expires_in = decoder['expires_in']
+        remind_in = decoder['remind_in']
+        uid = decoder['uid']
+
+        user_info_url = 'https://api.weibo.com/2/users/show.json?source=%s&uid=%s&access_token=%s' % (APP_KEY, uid, access_token)
+        req = urllib2.Request(user_info_url)
+        try:
+            res = urllib2.urlopen(req)
+            data = res.read()
+            user_data = JSONDecoder().decode(data)
+            request.session['name'] = user_data['screen_name']
+        except urllib2.HTTPError as ex:
+            error = ex.read()
+            print error
+
+        request.session['logined'] = True
+        request.session['token'] = access_token
+        request.session['uid'] = uid
+        return HttpResponseRedirect('/bijia/index')
+    else:
+        return HttpResponse("<h1>Logined</h1>")
+
+def msgpostview(request):
+    post_url = 'https://api.weibo.com/2/statuses/update.json'
+
+    content = u"我看你最值"
+    if isinstance(content, unicode):
+        content = content.encode('utf-8')
+
+    data = {'source':APP_KEY,
+            'access_token':request.session.get('token'),
+            'status':content,
+            }
+    req = urllib2.Request(post_url)
+
+    try:
+        response = urllib2.urlopen(req, data = urllib.urlencode(data))
+        return_data = response.read()
+        resp_api = JSONDecoder().decode(return_data)
+        return HttpResponse("<h1>%s</h1>" % (resp_api['created_at']))
+    except urllib2.HTTPError as ex:
+        print ex.read()
+    return HttpResponse("<h1>发布失败</h1>")
 
 def addipview(request):
     serverip = request.GET.get('ip', '127.0.0.1')
