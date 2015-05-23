@@ -99,5 +99,5 @@ MONGO_PORT = 27017
 connect(MONGO_DATABASE_NAME, host=MONGO_HOST, port=MONGO_PORT)
 
 
-WEIBO_REDIRECT_URL='http://127.0.0.1/bijia/weibo'
-#WEIBO_REDIRECT_URL='http://www.xierqi.net/bijia/weibo'
+#WEIBO_REDIRECT_URL='http://127.0.0.1/bijia/weibo'
+WEIBO_REDIRECT_URL='http://www.xierqi.net/bijia/weibo'
