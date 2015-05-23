@@ -127,9 +127,13 @@ def weibologinview(request):
         return HttpResponse("<h1>Logined</h1>")
 
 def msgpostview(request):
+    content = request.GET.get('content', '')
+
+    if not content:
+        return HttpResponse("<h1>无发布内容</h1>")
+
     post_url = 'https://api.weibo.com/2/statuses/update.json'
 
-    content = u"我看你最值"
     if isinstance(content, unicode):
         content = content.encode('utf-8')
 

@@ -8,7 +8,9 @@
         <div class="image-wrapper">
             <img height="60" width="60" src={{ BASE_URL }}img/{{ stock.uid }}.jpg />
         </div>
-        <span class="stock_post"><img height="12" width="12" src={{ BASE_URL }}image/{{ provider }}_favicon.ico><a>京东</a>&nbsp;&nbsp;</span><br/>
+        <span class="stock_post"><img height="12" width="12" src={{ BASE_URL }}image/{{ provider }}_favicon.ico><a>京东</a>&nbsp;&nbsp;</span>
+        <a href="/bijia/post?content={{ stock.url }}">分享</a>
+        <br/>
         <span class="stock_title"><a href={{ stock.url }} target="_blank">{{ stock.name }}</a></span><br/>
         <span class="stock_price">
             {{ stock.last_price }} 移动端 {{ stock.last_mobile_price }}
