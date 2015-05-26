@@ -12,6 +12,7 @@
 
 <link rel="stylesheet" href="{{ BASE_URL }}css/bootstrap.css">
 <link rel="stylesheet" href="{{ BASE_URL }}css/bijia.css">
+<link rel="stylesheet" href="{{ BASE_URL }}css/font-awesome.css">
 
 <script>
     function onCategorySelect()
@@ -26,8 +27,12 @@
 
 {% block navigator %}
     <div id="navigation">
-        <ul id="nav" class="menu">
-            <li class="nav-link">商家
+        <ul id="nav" class="menu pull-left">
+            <li class="nav-link pull-left">
+                <i class="fa fa-align-justify" id="switcher"></i>
+                <span id="leftSwitcher2" title="Show slide bar"></span>
+            </li>
+            <li class="nav-link pull-left">商家
                 <select id="stock_provider" class="nav-select">
                     <option value="jd">京东</option>
                 </select>
@@ -47,9 +52,11 @@
             <li class="nav-link">
                 <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=1>我看你最值</a>
             </li>
+            <!--
             <li class="nav-link">
                 <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=2>全部商品</a>
             </li>
+            -->
             <li class="nav-link">
                 <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=3>今日新品</a>
             </li>
@@ -59,18 +66,27 @@
             <li class="nav-link">
                 <a href=/bijia/index?provider={{ provider }}&category={{ category }}&show=5>移动好价</a>
             </li>
+
+        </ul>
+        <ul id="nav" class="menu pull-right">
             {% if logined %}
-            <li class="nav-link">
+            <li class="nav-link pull-right">
                 {{ name }}
             </li>
-            <li class="nav-link">
+            <li class="nav-link pull-right">
                 <a href=/bijia/post>发微博</a>
             </li>
             {% else %}
-            <li class="nav-link">
+            <li class="nav-link pull-right">
                 <a href="https://api.weibo.com/oauth2/authorize?client_id=433156516&response_type=code&redirect_uri={{ redirect_url }}">登陆</a>
             </li>
             {% endif %}
+            <li class="nav-link dropdown">
+                <span class="fa fa-info-circle"></span>
+                <ul class="dropdown-menu">
+                    <li class="dropdown">about</li>
+                </ul>
+            </li>
         </ul>
     </div>
 {% endblock %}
