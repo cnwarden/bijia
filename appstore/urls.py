@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^bijia/', include('bijia.urls')),
+    url(r'^youku/', include('youku.urls')),
 )
