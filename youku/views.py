@@ -8,6 +8,9 @@ from youku import YouKu
 
 def youku_list(request):
     url = request.GET.get("url","")
+    if not url:
+        return HttpResponse("pls with url parameter")
+
     content = ""
     yk = YouKu()
     yk.getList(url)
