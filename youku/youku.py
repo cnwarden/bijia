@@ -33,14 +33,18 @@ class YouKu(object):
             video_url = video_li.a['href']
             self.videos.append((video_name, video_url))
 
+    def clean(self):
+        self.videos = []
+
 
 
 
 if __name__ == "__main__":
-    youku = YouKu()
-    print dir(youku)
-    youku.getList("http://www.soku.com/detail/show/XMTAzNjc5Ng==")
-    for item in youku.videos:
-        print item[1]
+    pass
+#    youku = YouKu()
+#    print dir(youku)
+#    youku.getList("http://www.soku.com/detail/show/XMTAzNjc5Ng==")
+#    for item in youku.videos:
+#        print item[1]
 
 

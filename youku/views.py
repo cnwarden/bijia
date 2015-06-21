@@ -18,5 +18,5 @@ def youku_list(request):
     content += "<h2>%d</h2>" % (yk.videos.__len__())
     for item in yk.videos:
         content = content + "%02d;%s<br/>" % (int(item[0]),item[1])
-
+    yk.clean()
     return HttpResponse(content)
